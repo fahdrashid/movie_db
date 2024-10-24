@@ -1,23 +1,14 @@
-# Use the official Node.js image
-FROM node:18-alpine
+FROM node:16-alpine
 
-# Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Copy the wait-for-it.sh script
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
 
-# Expose port 3000
-EXPOSE 3000
-
-# Start the app
-CMD ["npm", "run", "start:prod"]
+CMD ["sh", "-c", "./wait-for-it.sh postgres:5432 -- npm run start:prod"]
