@@ -1,25 +1,28 @@
-version: '3.8'
 services:
-  app:
-    build: .
-    container_name: nestjs-app
-    ports:
-      - '3000:3000'
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432  # Use the new port in the environment
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: movie_db
-    depends_on:
-      - database
-
-  database:
+  postgres:
     image: postgres:latest
     container_name: postgres-db
     environment:
-      POSTGRES_DB: movie_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: movie_db
     ports:
-      - '5432:5432'  # Map to a different host port
+      - "5432:5432"
+    networks:
+      - my_network
+
+  nestjs_app:
+    build: .
+    container_name: nestjs-app
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/movie_db
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
