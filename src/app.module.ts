@@ -5,20 +5,24 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { Movie } from './movies/movie.entity';
 import { User } from './users/user.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT, 10),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [Movie, User],
-      synchronize: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
-    MoviesModule,  // Ensure MoviesModule is imported here
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule, Movie, User],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get<string>('DATABASE_URL'),
+        autoLoadEntities: true,
+        synchronize: true, // set to false in production
+      }),
+    }),
+    MoviesModule, // Ensure MoviesModule is imported here
     UsersModule,
     AuthModule,
   ],
