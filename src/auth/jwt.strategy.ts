@@ -15,6 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   // Validate the JWT payload and attach the user to the request
   async validate(payload: any) {
+    console.log('payload', payload);
     const user = await this.usersService.findByEmail(payload.sub);  // Find the user by ID
     if (!user) {
       throw new UnauthorizedException();  // Throw error if user not found
