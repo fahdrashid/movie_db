@@ -14,8 +14,11 @@ import { join } from 'path';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),  // Set the directory path
-      serveRoot: '/uploads',  // URL prefix to access the files
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+      serveStaticOptions: {
+        index: false,  // Prevent serving 'index.html'
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule, Movie, User],
