@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { User } from '../users/user.entity';  // Adjust import as per your folder structure
 
 @Entity()
 export class Movie {
@@ -8,9 +9,12 @@ export class Movie {
   @Column()
   title: string;
 
-  @Column('int')
+  @Column()
   publishingYear: number;
 
   @Column({ nullable: true })
   poster: string;
+
+  @ManyToOne(() => User, (user) => user.movies, { onDelete: 'CASCADE' })
+  user: User;
 }

@@ -11,11 +11,13 @@ import {
     UseInterceptors,
     HttpCode,
     HttpStatus,
+    Request,
+    Query,
   } from '@nestjs/common';
   import { MoviesService } from './movies.service';
   import { Movie } from './movie.entity';
   import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-  import { ApiTags, ApiBearerAuth, ApiOperation, ApiConsumes, ApiBody, ApiResponse } from '@nestjs/swagger';
+  import { ApiTags, ApiBearerAuth, ApiOperation, ApiConsumes, ApiBody, ApiResponse, ApiQuery } from '@nestjs/swagger';
   import { FileInterceptor } from '@nestjs/platform-express';
   import { diskStorage } from 'multer';
   import { extname } from 'path';
@@ -29,10 +31,16 @@ import {
   
     // Get all movies
     @Get()
-    @ApiOperation({ summary: 'Get all movies' })
-    @ApiResponse({ status: 200, description: 'List of movies retrieved successfully.' })
-    async findAll(): Promise<Movie[]> {
-      return this.moviesService.findAll();
+    @ApiOperation({ summary: 'Get user-specific movies with pagination' })
+    @ApiQuery({ name: 'page', required: false, example: 1, description: 'Page number' })
+    @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Number of movies per page' })
+    async findAll(
+      @Request() req,
+      @Query('page') page: number = 1,
+      @Query('limit') limit: number = 10,
+    ) {
+      const user = req.user; // User is attached to the request object by JwtAuthGuard
+      return this.moviesService.findAll(user, page, limit);
     }
   
     // Get a single movie by ID

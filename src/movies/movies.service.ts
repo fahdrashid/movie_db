@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Movie } from './movie.entity';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class MoviesService {
@@ -11,8 +12,14 @@ export class MoviesService {
   ) {}
 
   // Get all movies
-  async findAll(): Promise<Movie[]> {
-    return this.moviesRepository.find();
+  async findAll(user: User, page: number, limit: number): Promise<Movie[]> {
+    const skip = (page - 1) * limit;
+
+    return this.moviesRepository.find({
+      where: { user: { id: user.id } },
+      skip: skip,
+      take: limit,
+    });
   }
 
   // Get a single movie by ID
