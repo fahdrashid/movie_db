@@ -14,7 +14,6 @@ export class MoviesService {
   // Get all movies
   async findAll(user: User, page: number, limit: number): Promise<Movie[]> {
     const skip = (page - 1) * limit;
-
     return this.moviesRepository.find({
       where: { user: { id: user.id } },
       skip: skip,
@@ -32,8 +31,11 @@ export class MoviesService {
   }
 
   // Create a new movie
-  async create(movieData: Partial<Movie>): Promise<Movie> {
-    const movie = this.moviesRepository.create(movieData);
+  async create(movieData: Partial<Movie>, user: User): Promise<Movie> {
+    const movie = this.moviesRepository.create({
+      ...movieData,
+      user,  // Associate the movie with the user
+    });
     return this.moviesRepository.save(movie);
   }
 

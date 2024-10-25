@@ -79,13 +79,15 @@ import {
     })
     @ApiResponse({ status: 201, description: 'Movie created successfully.' })
     async create(
+      @Request() req,
       @Body() movieData: Partial<Movie>,
       @UploadedFile() file: Express.Multer.File,
     ): Promise<Movie> {
       if (file) {
         movieData.poster = file.filename; // Save the uploaded file's name
       }
-      return this.moviesService.create(movieData);
+      const user = req.user;
+      return this.moviesService.create(movieData, user);
     }
   
     // Update an existing movie by ID
